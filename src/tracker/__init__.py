@@ -13,6 +13,7 @@ BRONZE.mkdir(parents=True, exist_ok=True)
 
 # --- loaders (keep only columns we need) ---
 
+# noinspection PyTypeChecker
 def load_races(path: Path) -> pd.DataFrame:
     usecols = ["raceId", "date"]
     df = pd.read_csv(path, usecols=usecols, na_values=NA, parse_dates=["date"], keep_default_na=True)
@@ -20,6 +21,7 @@ def load_races(path: Path) -> pd.DataFrame:
     return df
 
 
+# noinspection PyTypeChecker
 def load_constructors(path: Path) -> pd.DataFrame:
     usecols = ["constructorId", "name"]
     df = pd.read_csv(path, usecols=usecols, na_values=NA, keep_default_na=True)
@@ -27,6 +29,7 @@ def load_constructors(path: Path) -> pd.DataFrame:
     return df
 
 
+# noinspection PyTypeChecker
 def load_constructor_results(path: Path) -> pd.DataFrame:
     usecols = ["raceId", "constructorId", "points"]
     df = pd.read_csv(path, usecols=usecols, na_values=NA, keep_default_na=True)
