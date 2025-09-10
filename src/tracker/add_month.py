@@ -19,6 +19,14 @@ def load_bronze(path: Path) -> pd.DataFrame:
 
 def add_month_col(df: pd.DataFrame) -> pd.DataFrame:
     # TODO: ensure race_date is datetime64[ns]
+    print(df["race_date"].dtype)  # what pandas thinks this column is
+    print(df["race_date"].head().to_list())  # a few sample values
+    assert pd.api.types.is_datetime64_any_dtype(df["race_date"]), "race_date must be datetime"
+    print(df["race_date"].min(), "→", df["race_date"].max())
+    print("dtype:", df["race_date"].dtype)
+    print("NaT count:", df["race_date"].isna().sum())
+    print("Range:", df["race_date"].min(), "→", df["race_date"].max())
+
     # TODO: derive m = first day of the month (datetime64[ns])
     # HINT: to_period('M').dt.to_timestamp('MS') or floor to month
     return df
@@ -67,4 +75,6 @@ def main(option: str = "A") -> None:
 
 if __name__ == "__main__":
     # Run A for now; switch to B to practice partitioning
-    main(option="A")
+    # main(option="A")
+    before = load_bronze(INP)
+    add_month_col(before.copy())
