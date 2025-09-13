@@ -18,17 +18,22 @@ def load_bronze(path: Path) -> pd.DataFrame:
 
 
 def add_month_col(df: pd.DataFrame) -> pd.DataFrame:
-    # TODO: ensure race_date is datetime64[ns]
-    print(df["race_date"].dtype)  # what pandas thinks this column is
-    print(df["race_date"].head().to_list())  # a few sample values
-    assert pd.api.types.is_datetime64_any_dtype(df["race_date"]), "race_date must be datetime"
-    print(df["race_date"].min(), "→", df["race_date"].max())
-    print("dtype:", df["race_date"].dtype)
-    print("NaT count:", df["race_date"].isna().sum())
-    print("Range:", df["race_date"].min(), "→", df["race_date"].max())
+    """
 
-    # TODO: derive m = first day of the month (datetime64[ns])
-    # HINT: to_period('M').dt.to_timestamp('MS') or floor to month
+    :type df: pd.DataFrame
+    """
+    if not pd.api.types.is_datetime64_any_dtype(df["race_date"]):
+        df["race_date"] = pd.to_datetime(df["race_date"], errors="raise")
+
+    if getattr(df["race_date"].dt, "tz", None) is not None:
+        df["race_date"] = df["race_date"].dt.tz_localize(None)
+
+    m = df["race_date"].dt.to_period("M").dt.to_timestamp("MS")
+    df["m"] = m
+
+    assert pd.api.types.is_datetime64_any_dtype(df["m"]), "m must be datetime64[ns]"
+    assert (df["m"].dt.day == 1).all(), "m must be the first day of the month"
+
     return df
 
 
