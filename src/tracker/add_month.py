@@ -55,11 +55,57 @@ def save_simple(df: pd.DataFrame) -> Path:
 
 
 def save_partitioned(df: pd.DataFrame) -> Path:
-    # Minimal approach: write per-month files in a loop
+    """
+     Returns the base output directory path.
+    """
+
+    # --- Preconditions: we require an 'm' column that is a real datetime -----------
+    # Guard that the column exists; fail early if upstream steps were skipped.
+    assert "m" in df.columns, "Expected column 'm' missing; run add_month_col first"
+
+    # Guard that 'm' is a datetime64 (not a string/Period); partition values come from it.
+    assert pd.api.types.is_datetime64_any_dtype(df["m"]), "'m' must be datetime64[ns]"
+
+    # Optional sanity: every 'm' should be the first of its month; catches bad derivations.
+    assert (df["m"].dt.day == 1).all(), "'m' must be the first day of the month"
+
+    # --- Prepare the output root directory ----------------------------------------
+    # OUT_PARTITIONED is a module-level Path like data/bronze/by_month.
     base = OUT_PARTITIONED
+
+    # Ensure the directory exists (mkdir -p behavior with parents=True).
     base.mkdir(parents=True, exist_ok=True)
-    # TODO: loop over unique months and write df[df.m==month] to base / f"m={month:%Y-%m-01}" / "part.parquet"
-    # HINT: ensure month formatting exactly matches YYYY-MM-01
+
+    # --- Iterate months and write a Parquet per partition -------------------------
+    # We keep a running total to cross-check that we didn't lose/duplicate rows.
+    total_rows = 0
+
+    # Sort by 'm' for predictable folder ordering, then group rows by month value.
+    for month_ts, part_df in df.sort_values("m").groupby("m", sort=True):
+        # `month_ts` is a pandas Timestamp; we'll turn it into a folder-friendly label.
+        # We want EXACT format 'YYYY-MM-01' to match our medallion examples and make joins predictable.
+        month_label = month_ts.strftime("%Y-%m-01")
+
+        # Build the subfolder path like data/bronze/by_month/m=1950-05-01
+        subdir = base / f"m={month_label}"
+
+        # Create the partition directory if it doesn't exist yet.
+        subdir.mkdir(parents=True, exist_ok=True)
+
+        # Choose a simple, single-file name inside each partition.
+        out_path = subdir / "part.parquet"
+
+        # Write only the rows for this month partition (no index column).
+        part_df.to_parquet(out_path, index=False)
+
+        # Update our row counter to validate completeness.
+        total_rows += len(part_df)
+
+    # --- Postconditions: quick integrity check ------------------------------------
+    # Confirm that the sum of all written rows equals the input row count.
+    assert total_rows == len(df), f"Row mismatch: wrote {total_rows} but input had {len(df)}"
+
+    # Return the base directory so callers can print/log where data landed.
     return base
 
 
