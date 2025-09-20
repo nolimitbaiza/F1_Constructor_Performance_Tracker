@@ -44,7 +44,7 @@ def plot_topk_for_month(df: pd.DataFrame, ym: str, k: int = 10) -> Path:
     ax.set_xlabel("Points in Month")
 
     # Saves chart into reports/charts with a consistent name.
-    out = OUTDIR / f"top{min(k, len(sub))}_{ym}.png"
+    out = OUTDIR / f"top10_{ym}.png"
     fig.tight_layout()
     fig.savefig(out, dpi=160)
     plt.close(fig)
