@@ -1,4 +1,4 @@
-# F1 Constructor Performance by month from 1950 to 2025
+# F1 Constructor Performance by month from 1958 to 2025
 
 ## What this project does
 This project turns raw Formula 1 race results into easy-to-read monthly summaries for each team (constructor). It:
@@ -6,12 +6,12 @@ This project turns raw Formula 1 race results into easy-to-read monthly summarie
 - cleans them and adds a month label,
 - adds up each team’s points per month,
 - compares a month to the previous month (Month-over-Month growth),
-- makes a chart that shows the Top 10 teams for any month you pick (like Aug 2012 or Apr 1993).
+- makes a chart that shows the Top 10 teams for any month you pick (e.g. Aug 2012 or Apr 1993).
 
 You can quickly see which team was strongest in a given month, and how their performance changed compared to the previous month.
 
 ### Examples of charts
-You can find every month chart preuploaded since January 1958 in reports/charts. 
+You can find every month (since January 1958) chart preuploaded in reports/charts. 
 Or you can use the [interactive webapp](https://github.com/nolimitbaiza/f1_constructor_performance_tracker/blob/13b233f31aaef891108e371537e3fb9cbac56885/reports/index.html) where you can choose what month performance you want to see. 
 
 <img width="1280" height="800" alt="top10_1958-01" src="https://github.com/user-attachments/assets/0974e93f-c6e2-4539-8e79-c542b2ff9fe2" />
